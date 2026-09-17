@@ -357,3 +357,86 @@ impl Database {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn test_db_init_and_project() {
+        let db = Database::new(":memory:").expect("Failed to create memory db");
+        let proj = db.get_default_project().expect("Failed to get default project");
+        assert_eq!(proj.id, "1");
+        assert_eq!(proj.name, "Default Project");
+    }
+
+    #[test]
+    fn test_record_and_deduplicate() {
+        let db = Database::new(":memory:").unwrap();
+        let payload = json!({"level": "error", "message": "Crash"});
+
+        // 1st event
+        let (issue_id1, event_id1) = db
+            .record_event("1", "ev-1", "fp-a", "Error A", "main.rs:1", "error", "rust", &payload)
+            .unwrap();
+
+        // 2nd event with same fingerprint -> should group to same issue
+        let (issue_id2, event_id2) = db
+            .record_event("1", "ev-2", "fp-a", "Error A", "main.rs:1", "error", "rust", &payload)
+            .unwrap();
+
+        assert_eq!(issue_id1, issue_id2);
+        assert_ne!(event_id1, event_id2);
+
+        let issues = db.list_issues(Some("1"), None, 10).unwrap();
+        assert_eq!(issues.len(), 1);
+        assert_eq!(issues[0].count, 2);
+
+        let (issue, events) = db.get_issue(&issue_id1).unwrap().unwrap();
+        assert_eq!(issue.id, issue_id1);
+        assert_eq!(events.len(), 2);
+    }
+
+    #[test]
+    fn test_status_update_and_stats() {
+        let db = Database::new(":memory:").unwrap();
+        let payload = json!({"level": "error"});
+        let (issue_id, _) = db
+            .record_event("1", "ev-1", "fp-b", "Error B", "lib.rs:2", "error", "rust", &payload)
+            .unwrap();
+
+        let stats_before = db.get_stats().unwrap();
+        assert_eq!(stats_before.unresolved_issues, 1);
+
+        db.update_issue_status(&issue_id, "resolved").unwrap();
+
+        let stats_after = db.get_stats().unwrap();
+        assert_eq!(stats_after.unresolved_issues, 0);
+
+        // Filter by unresolved
+        let unresolved = db.list_issues(None, Some("unresolved"), 10).unwrap();
+        assert_eq!(unresolved.len(), 0);
+
+        // Filter by resolved
+        let resolved = db.list_issues(None, Some("resolved"), 10).unwrap();
+        assert_eq!(resolved.len(), 1);
+    }
+
+    #[test]
+    fn test_ai_settings_roundtrip() {
+        let db = Database::new(":memory:").unwrap();
+        let s = db.get_ai_settings().unwrap();
+        assert_eq!(s.provider, "ollama");
+
+        let mut custom = s;
+        custom.provider = "gemini".to_string();
+        custom.api_key = "secret123".to_string();
+        db.save_ai_settings(&custom).unwrap();
+
+        let loaded = db.get_ai_settings().unwrap();
+        assert_eq!(loaded.provider, "gemini");
+        assert_eq!(loaded.api_key, "secret123");
+    }
+}
+

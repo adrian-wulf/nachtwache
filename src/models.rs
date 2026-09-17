@@ -55,7 +55,7 @@ impl Default for AiSettings {
         Self {
             provider: "ollama".to_string(),
             api_key: "".to_string(),
-            model: "qwen2.5-coder:7b".to_string(),
+            model: "deepseek-4.1-flash".to_string(),
             endpoint: "http://localhost:11434".to_string(),
         }
     }
