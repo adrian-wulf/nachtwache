@@ -543,6 +543,22 @@
     }
     .copy-btn:hover { color: #fff; background: var(--surface-border-hover); }
 
+    .lang-dropdown {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      color: var(--text);
+      padding: 0.35rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .lang-dropdown:hover, .lang-dropdown:focus {
+      border-color: var(--primary);
+    }
+
     /* Footer */
     footer {
       border-top: 1px solid var(--surface-border);
@@ -587,14 +603,21 @@
       </a>
 
       <div class="nav-tabs">
-        <button class="nav-tab active" onclick="switchView('issues')">Zdarzenia & Błędy</button>
-        <button class="nav-tab" onclick="switchView('dsn')">Podłącz SDK</button>
-        <button class="nav-tab" onclick="switchView('settings')">Konfiguracja AI</button>
-        <button class="nav-tab" onclick="switchView('donate')">Co Łaska / Wesprzyj</button>
-        <button class="nav-tab" onclick="switchView('impressum')">Impressum</button>
+        <button class="nav-tab active" data-tab="issues" data-i18n="tab_issues" onclick="switchView('issues')">Zdarzenia & Błędy</button>
+        <button class="nav-tab" data-tab="dsn" data-i18n="tab_dsn" onclick="switchView('dsn')">Podłącz SDK</button>
+        <button class="nav-tab" data-tab="settings" data-i18n="tab_settings" onclick="switchView('settings')">Konfiguracja AI</button>
+        <button class="nav-tab" data-tab="donate" data-i18n="tab_donate" onclick="switchView('donate')">Co Łaska / Wesprzyj</button>
+        <button class="nav-tab" data-tab="impressum" data-i18n="tab_impressum" onclick="switchView('impressum')">Impressum</button>
       </div>
 
       <div class="nav-actions">
+        <select id="lang-select" onchange="setLanguage(this.value)" class="lang-dropdown" title="Select Language / Wybierz język">
+          <option value="en">🇬🇧 English</option>
+          <option value="pl">🇵🇱 Polski</option>
+          <option value="de">🇩🇪 Deutsch</option>
+          <option value="es">🇪🇸 Español</option>
+          <option value="fr">🇫🇷 Français</option>
+        </select>
         <button class="btn btn-secondary btn-sm" onclick="openDsnModal()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
@@ -602,7 +625,7 @@
           </svg>
           DSN
         </button>
-        <button class="btn btn-secondary btn-sm" onclick="refreshData()">
+        <button class="btn btn-secondary btn-sm" onclick="refreshData()" title="Odśwież / Refresh">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
             <path d="M3 3v5h5"/>
@@ -620,36 +643,36 @@
     <div id="view-issues">
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-title">Otwarte Błędy</div>
+          <div class="stat-title" data-i18n="stat_unresolved_title">Otwarte Błędy</div>
           <div class="stat-value" id="stat-unresolved">0</div>
-          <div class="stat-hint">Wymagające reakcji</div>
+          <div class="stat-hint" data-i18n="stat_unresolved_hint">Wymagające reakcji</div>
         </div>
         <div class="stat-card">
-          <div class="stat-title">Zdarzenia (24h)</div>
+          <div class="stat-title" data-i18n="stat_24h_title">Zdarzenia (24h)</div>
           <div class="stat-value" id="stat-24h">0</div>
-          <div class="stat-hint">Częstotliwość występowania</div>
+          <div class="stat-hint" data-i18n="stat_24h_hint">Częstotliwość występowania</div>
         </div>
         <div class="stat-card">
-          <div class="stat-title">Wszystkie Zdarzenia</div>
+          <div class="stat-title" data-i18n="stat_total_title">Wszystkie Zdarzenia</div>
           <div class="stat-value" id="stat-total">0</div>
-          <div class="stat-hint">Od uruchomienia bazy</div>
+          <div class="stat-hint" data-i18n="stat_total_hint">Od uruchomienia bazy</div>
         </div>
       </div>
 
       <div class="toolbar">
         <div class="filter-group">
-          <button class="filter-btn active" onclick="setFilter('unresolved')">Aktywne</button>
-          <button class="filter-btn" onclick="setFilter('resolved')">Rozwiązane</button>
-          <button class="filter-btn" onclick="setFilter('all')">Wszystkie</button>
+          <button class="filter-btn active" data-filter="unresolved" data-i18n="filter_unresolved" onclick="setFilter('unresolved')">Aktywne</button>
+          <button class="filter-btn" data-filter="resolved" data-i18n="filter_resolved" onclick="setFilter('resolved')">Rozwiązane</button>
+          <button class="filter-btn" data-filter="all" data-i18n="filter_all" onclick="setFilter('all')">Wszystkie</button>
         </div>
         <div style="display: flex; gap: 0.5rem;">
-          <input type="text" class="search-input" id="search-input" placeholder="Szukaj po nazwie lub pliku..." oninput="filterIssues()">
-          <button class="btn btn-danger btn-sm" onclick="clearAllData()" title="Wyczyść wszystkie dane">Wyczyść</button>
+          <input type="text" class="search-input" id="search-input" data-i18n-placeholder="search_placeholder" placeholder="Szukaj po nazwie lub pliku..." oninput="filterIssues()">
+          <button class="btn btn-danger btn-sm" data-i18n="btn_clear" onclick="clearAllData()" title="Wyczyść wszystkie dane">Wyczyść</button>
         </div>
       </div>
 
       <div class="issue-list" id="issue-list">
-        <div style="text-align: center; padding: 3rem; color: var(--text-subtle);">
+        <div style="text-align: center; padding: 3rem; color: var(--text-subtle);" data-i18n="no_issues">
           Brak zarejestrowanych błędów. Skieruj swoje Sentry SDK na ten serwer!
         </div>
       </div>
@@ -658,15 +681,15 @@
     <!-- View: DSN / Setup -->
     <div id="view-dsn" class="hidden">
       <div style="max-width: 800px; margin: 0 auto;">
-        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Jak podłączyć aplikację?</h2>
-        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;" data-i18n="dsn_title">Jak podłączyć aplikację?</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;" data-i18n="dsn_subtitle">
           Nachtwache jest w 100% kompatybilne z oficjalnymi bibliotekami Sentry. Wystarczy podmienić URL w <code>dsn</code>.
         </p>
 
-        <h3 style="font-size: 1rem; margin-top: 1.5rem;">1. Twój DSN Nachtwache</h3>
+        <h3 style="font-size: 1rem; margin-top: 1.5rem;" data-i18n="dsn_step1">1. Twój DSN Nachtwache</h3>
         <div class="code-snippet">
           <span id="dsn-display" style="font-family: 'JetBrains Mono'; color: #f59e0b;">http://public@localhost:8080/1</span>
-          <button class="copy-btn" onclick="copyText('dsn-display')">Kopiuj</button>
+          <button class="copy-btn" data-i18n="btn_copy" onclick="copyText('dsn-display')">Kopiuj</button>
         </div>
 
         <h3 style="font-size: 1rem; margin-top: 1.5rem;">2. JavaScript / TypeScript / React / Next.js</h3>
@@ -703,43 +726,43 @@ sentry_sdk.init(
     <!-- View: Settings (AI) -->
     <div id="view-settings" class="hidden">
       <div style="max-width: 600px; margin: 0 auto; background: var(--surface); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 10px;">
-        <h2 style="font-size: 1.35rem; margin-bottom: 0.5rem;">Konfiguracja silnika AI</h2>
-        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">
+        <h2 style="font-size: 1.35rem; margin-bottom: 0.5rem;" data-i18n="ai_title">Konfiguracja silnika AI</h2>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;" data-i18n="ai_subtitle">
           Wybierz model, który będzie automatycznie diagnozował błędy i generował łatki (patche).
         </p>
 
         <div class="form-group">
-          <label class="form-label">Dostawca Modelu AI</label>
+          <label class="form-label" data-i18n="ai_provider_label">Dostawca Modelu AI</label>
           <select id="ai-provider" class="form-control" onchange="updateProviderDefaults()">
-            <option value="ollama">Ollama (Lokalna, 100% darmowa)</option>
+            <option value="ollama">Ollama (Local / Free)</option>
             <option value="gemini">Google Gemini (Flash)</option>
-            <option value="openai">OpenAI / DeepSeek / Groq (Kompatybilne)</option>
+            <option value="openai">OpenAI / DeepSeek / Groq (Compatible)</option>
             <option value="anthropic">Anthropic Claude</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Endpoint URL</label>
+          <label class="form-label" data-i18n="ai_endpoint_label">Endpoint URL</label>
           <input type="text" id="ai-endpoint" class="form-control" placeholder="http://localhost:11434">
-          <span style="font-size: 0.75rem; color: var(--text-subtle);">Dla Ollama: http://localhost:11434, dla OpenAI: https://api.openai.com</span>
+          <span style="font-size: 0.75rem; color: var(--text-subtle);" data-i18n="ai_endpoint_hint">Dla Ollama: http://localhost:11434, dla OpenAI: https://api.openai.com</span>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Nazwa Modelu</label>
-          <input type="text" id="ai-model" class="form-control" placeholder="qwen2.5-coder:7b">
+          <label class="form-label" data-i18n="ai_model_label">Nazwa Modelu</label>
+          <input type="text" id="ai-model" class="form-control" placeholder="deepseek-4.1-flash">
         </div>
 
         <div class="form-group">
-          <label class="form-label">Klucz API (API Key)</label>
-          <input type="password" id="ai-apikey" class="form-control" placeholder="Pozostaw puste dla lokalnej Ollama">
+          <label class="form-label" data-i18n="ai_apikey_label">Klucz API (API Key)</label>
+          <input type="password" id="ai-apikey" class="form-control" data-i18n-placeholder="ai_apikey_placeholder" placeholder="Pozostaw puste dla lokalnej Ollama">
           <span id="ai-key-hint" style="font-size: 0.75rem; color: var(--text-subtle);"></span>
         </div>
 
-        <button class="btn btn-primary" onclick="saveAiSettings()">Zapisz Ustawienia</button>
+        <button class="btn btn-primary" data-i18n="btn_save_settings" onclick="saveAiSettings()">Zapisz Ustawienia</button>
       </div>
     </div>
 
-    <!-- View: Donate / Co Łaska -->
+    <!-- View: Donate / Support -->
     <div id="view-donate" class="hidden">
       <div style="max-width: 650px; margin: 0 auto; text-align: center; padding: 2rem 1rem;">
         <div style="width: 54px; height: 54px; background: var(--primary-glow); border: 1px solid var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem auto;">
@@ -751,44 +774,85 @@ sentry_sdk.init(
             <line x1="14" y1="1" x2="14" y2="4"/>
           </svg>
         </div>
-        <h2 style="font-size: 1.6rem; margin-bottom: 0.75rem;">Model „Co łaska”</h2>
-        <p style="color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+        <h2 style="font-size: 1.6rem; margin-bottom: 0.75rem;" data-i18n="donate_title">Model „Co łaska” & Filozofia RobinHood dev</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;" data-i18n="donate_intro">
           Nachtwache to niezależny projekt <strong>100% Open Source (MIT)</strong>. 
           Zamiast płacić setki dolarów korporacjom i stawiać kontenery pożerające 20 GB pamięci RAM, dostajesz lekkie, samodzielne narzędzie ze wsparciem AI.
         </p>
 
         <div style="background: var(--surface); border: 1px solid var(--surface-border); border-radius: 10px; padding: 1.5rem; margin-bottom: 2rem; text-align: left;">
-          <h4 style="color: #fff; margin-bottom: 0.5rem;">Dlaczego warto postawić kawę?</h4>
+          <h4 style="color: #fff; margin-bottom: 0.5rem;" data-i18n="donate_why">Dlaczego warto wesprzeć?</h4>
           <ul style="color: var(--text-muted); font-size: 0.85rem; padding-left: 1.25rem; line-height: 1.7;">
-            <li>Zero abonamentów i ukrytych opłat za liczbę zdarzeń.</li>
-            <li>Brak blokad licencyjnych BSL / FSL – pełna swoboda.</li>
-            <li>Wspierasz rozwój funkcji AI Auto-Fix (automatyczne PR-y na GitHubie).</li>
+            <li data-i18n="donate_p1">Zero abonamentów i ukrytych opłat za liczbę zdarzeń.</li>
+            <li data-i18n="donate_p2">Brak blokad licencyjnych BSL / FSL – pełna swoboda biznesowa.</li>
+            <li data-i18n="donate_p3">Wspierasz rozwój funkcji AI Auto-Fix (automatyczne PR-y na GitHubie).</li>
+            <li data-i18n="donate_p4">Pomagasz utrzymać serwery publicznych instancji demonstracyjnych.</li>
           </ul>
         </div>
 
-    <!-- View: Impressum & Datenschutz (§ 5 DDG) -->
-    <div id="view-impressum" class="hidden">
-      <div style="max-width: 650px; margin: 0 auto; background: var(--surface); border: 1px solid var(--surface-border); border-radius: 10px; padding: 2rem;">
-        <h2 style="font-size: 1.5rem; margin-bottom: 1rem;">Impressum (§ 5 DDG)</h2>
-        <div style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.8;">
-          <p><strong>Angaben gemäß § 5 DDG:</strong></p>
-          <p>Adrian Wulf (Nachtwache Open Source Project)<br>
-          Kontakt: <a href="mailto:contact@social-wulf.eu" style="color: var(--primary);">contact@social-wulf.eu</a><br>
-          Website: <a href="https://social-wulf.eu" target="_blank" style="color: var(--primary);">social-wulf.eu</a></p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+          <a href="https://buymeacoffee.com/adrianwulf" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="padding: 0.75rem 1.5rem; font-size: 0.95rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+            ☕ Buy Me a Coffee (Karta, BLIK, PayPal) ↗
+          </a>
+          <a href="https://github.com/sponsors/adrian-wulf" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="padding: 0.75rem 1.5rem; font-size: 0.95rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; border-color: #EA4AAA; color: #EA4AAA;">
+            💖 GitHub Sponsors ↗
+          </a>
+        </div>
+      </div>
+    </div>
 
-          <h3 style="font-size: 1rem; margin-top: 1.5rem; color: #fff;">Haftungsausschluss (Disclaimer)</h3>
+    <!-- View: Impressum & Datenschutz (§ 5 DDG / MStV / DSGVO) -->
+    <div id="view-impressum" class="hidden">
+      <div style="max-width: 720px; margin: 0 auto; background: var(--surface); border: 1px solid var(--surface-border); border-radius: 10px; padding: 2rem;">
+        <h2 style="font-size: 1.5rem; margin-bottom: 1rem; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+          <span>⚖️</span>
+          <span data-i18n="impressum_title">Impressum & Nota Prawna (§ 5 DDG)</span>
+        </h2>
+        <div style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.8;">
+          <p><strong>Angaben gemäß § 5 Digitale-Dienste-Gesetz (DDG):</strong></p>
           <p>
-            Nachtwache ist ein quelloffenes Softwareprojekt (Open Source, MIT-Lizenz). 
-            Diese Instanz dient ausschließlich Entwicklungs-, Test- und Demonstrationszwecken. 
-            Es besteht kein Anspruch auf Verfügbarkeit (SLA). Die Software wird „wie besehen“ (as is) 
+            <strong>Adrian Wulf</strong><br>
+            Nachtwache Open Source Project & Wulf Ecosystem<br>
+            Bundesrepublik Deutschland / Republika Federalna Niemiec<br>
+            Elektronischer Kontakt / E-Mail: <a href="mailto:contact@social-wulf.eu" style="color: var(--primary);">contact@social-wulf.eu</a><br>
+            Ecosystem Hub: <a href="https://social-wulf.eu" target="_blank" rel="noopener noreferrer" style="color: var(--primary);">https://social-wulf.eu</a><br>
+            GitHub: <a href="https://github.com/adrian-wulf/nachtwache" target="_blank" rel="noopener noreferrer" style="color: var(--primary);">github.com/adrian-wulf/nachtwache</a>
+          </p>
+
+          <h3 style="font-size: 1rem; margin-top: 1.5rem; color: #fff;">Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h3>
+          <p>
+            Adrian Wulf<br>
+            E-Mail: contact@social-wulf.eu
+          </p>
+
+          <h3 style="font-size: 1rem; margin-top: 1.5rem; color: #fff;">Umsatzsteuer-Status</h3>
+          <p>
+            Als unabhängiges Open-Source-Projekt (MIT-Lizenz) erfolgt kein gewerblicher Verkauf von Waren über diese Webanwendung. Gemäß § 19 UStG wird keine Umsatzsteuer ausgewiesen.
+          </p>
+
+          <h3 style="font-size: 1rem; margin-top: 1.5rem; color: #fff;">Haftungsausschluss (Disclaimer & AS IS)</h3>
+          <p>
+            Nachtwache ist ein freies Open-Source-Softwareprojekt (MIT License). 
+            Diese Instanz dient Entwicklungs-, Test- und Demonstrationszwecken. 
+            Es besteht kein Anspruch auf permanente Verfügbarkeit (SLA). Die Software wird „wie besehen“ (AS IS) 
             ohne ausdrückliche oder stillschweigende Gewährleistung bereitgestellt.
           </p>
 
-          <h3 style="font-size: 1rem; margin-top: 1.5rem; color: #fff;">Datenschutz (DSGVO)</h3>
+          <h3 style="font-size: 1rem; margin-top: 1.5rem; color: #fff;">Datenschutz (DSGVO / RODO)</h3>
           <p>
             Diese Instanz verarbeitet ausschließlich technische Fehlerberichte (Stacktraces, Error-Messages, 
             vom Entwickler übertragene Breadcrumbs), die über das Sentry-kompatible DSN-Protokoll eingehen. 
-            Es findet kein Profiling, kein Verkauf und keine Weitergabe an Dritte statt.
+            Es findet kein Profiling, kein Verkauf und keine Weitergabe an Dritte statt. Alle Daten werden lokal 
+            in einer SQLite-WAL-Datenbank auf dem Server gespeichert.
+          </p>
+          <p>
+            Nutzer können jederzeit die Löschung von übertragenen Test-Events verlangen (E-Mail an: <a href="mailto:contact@social-wulf.eu" style="color: var(--primary);">contact@social-wulf.eu</a>) 
+            oder im Dashboard alle Ereignisse über den Button „Wyczyść Wszystkie Zdarzenia” eigenständig entfernen.
+          </p>
+
+          <h3 style="font-size: 1rem; margin-top: 1.5rem; color: #fff;">Markenhinweis (Trademark Notice)</h3>
+          <p>
+            „Sentry” ist eine eingetragene Marke der Functional Software, Inc. Nachtwache ist ein unabhängiges, quelloffenes Ersatzprodukt und steht in keiner geschäftlichen oder gesellschaftsrechtlichen Verbindung zur Functional Software, Inc.
           </p>
         </div>
       </div>
@@ -811,10 +875,10 @@ sentry_sdk.init(
       <div style="display: flex; gap: 0.5rem; align-items: center; justify-content: space-between;">
         <div style="display: flex; gap: 0.5rem;">
           <button class="btn btn-secondary btn-sm" id="btn-resolve" onclick="toggleResolveCurrent()">Oznacz jako Rozwiązane</button>
-          <button class="btn btn-secondary btn-sm" id="btn-ignore" onclick="toggleIgnoreCurrent()">Ignoruj</button>
+          <button class="btn btn-secondary btn-sm" id="btn-ignore" data-i18n="btn_ignore" onclick="toggleIgnoreCurrent()">Ignoruj</button>
         </div>
         <button class="btn btn-primary btn-sm" id="btn-ai-diagnose" onclick="diagnoseCurrentWithAi()">
-          ⚡ Diagnozuj z AI
+          ⚡ <span data-i18n="btn_diagnose">Diagnozuj z AI</span>
         </button>
       </div>
 
@@ -825,9 +889,9 @@ sentry_sdk.init(
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
             </svg>
-            Analiza Przyczyny & Auto-Fix
+            <span data-i18n="ai_card_title">Analiza Przyczyny & Auto-Fix</span>
           </div>
-          <button class="btn btn-secondary btn-sm" onclick="copyAiDiff()">Kopiuj Poprawkę</button>
+          <button class="btn btn-secondary btn-sm" data-i18n="btn_copy_diff" onclick="copyAiDiff()">Kopiuj Poprawkę</button>
         </div>
         <div id="modal-ai-explanation" style="font-size: 0.85rem; color: #e2e8f0; line-height: 1.6;"></div>
         <div class="ai-diff-box hidden" id="modal-ai-diff-box">
@@ -837,22 +901,28 @@ sentry_sdk.init(
 
       <!-- Stack Trace -->
       <div>
-        <h3 style="font-size: 0.95rem; margin-bottom: 0.75rem;">Stack Trace</h3>
+        <h3 style="font-size: 0.95rem; margin-bottom: 0.75rem;" data-i18n="stack_title">Stack Trace</h3>
         <div class="stack-trace" id="modal-stack"></div>
       </div>
 
       <!-- Breadcrumbs -->
       <div>
-        <h3 style="font-size: 0.95rem; margin-bottom: 0.75rem;">Ostatnie Akcje (Breadcrumbs)</h3>
+        <h3 style="font-size: 0.95rem; margin-bottom: 0.75rem;" data-i18n="bc_title">Ostatnie Akcje (Breadcrumbs)</h3>
         <div class="bc-list" id="modal-breadcrumbs"></div>
       </div>
     </div>
   </div>
 
   <footer>
-    Nachtwache — Lekki i autonomiczny strażnik błędów. Sandbox udostępniony na licencji MIT.
+    <span data-i18n="footer_text">Nachtwache — Lekki i autonomiczny strażnik błędów. Sandbox udostępniony na licencji MIT.</span>
     <br>
-    <span style="opacity: 0.6;">Hostowane na Twoim VPS • <a href="https://social-wulf.eu" target="_blank">social-wulf.eu</a></span>
+    <span style="opacity: 0.7;">
+      <a href="https://social-wulf.eu" target="_blank" rel="noopener noreferrer">Hub social-wulf.eu ↗</a>
+      • <a href="https://lead.social-wulf.eu" target="_blank" rel="noopener noreferrer">Wulf Lead.er ↗</a>
+      • <a href="javascript:switchView('impressum')" data-i18n="footer_impressum">Impressum & Datenschutz (§ 5 DDG)</a>
+      • <a href="javascript:switchView('donate')" data-i18n="footer_donate">Co Łaska ☕</a>
+      • <a href="https://github.com/adrian-wulf/nachtwache" target="_blank" rel="noopener noreferrer">GitHub @adrian-wulf ↗</a>
+    </span>
   </footer>
 
   <script>
@@ -860,6 +930,362 @@ sentry_sdk.init(
     let currentFilter = 'unresolved';
     let currentActiveIssue = null;
     let currentDsn = '';
+    let currentLang = 'en';
+
+    const I18N = {
+      pl: {
+        tab_issues: "Zdarzenia & Błędy",
+        tab_dsn: "Podłącz SDK",
+        tab_settings: "Konfiguracja AI",
+        tab_donate: "Co Łaska / Wesprzyj",
+        tab_impressum: "Impressum",
+        stat_unresolved_title: "Otwarte Błędy",
+        stat_unresolved_hint: "Wymagające reakcji",
+        stat_24h_title: "Zdarzenia (24h)",
+        stat_24h_hint: "Częstotliwość występowania",
+        stat_total_title: "Wszystkie Zdarzenia",
+        stat_total_hint: "Od uruchomienia bazy",
+        filter_unresolved: "Aktywne",
+        filter_resolved: "Rozwiązane",
+        filter_all: "Wszystkie",
+        search_placeholder: "Szukaj po nazwie lub pliku...",
+        btn_clear: "Wyczyść",
+        no_issues: "Brak zarejestrowanych błędów. Skieruj swoje Sentry SDK na ten serwer!",
+        no_search_results: "Brak wyników wyszukiwania.",
+        dsn_title: "Jak podłączyć aplikację?",
+        dsn_subtitle: "Nachtwache jest w 100% kompatybilne z oficjalnymi bibliotekami Sentry. Wystarczy podmienić URL w <code>dsn</code>.",
+        dsn_step1: "1. Twój DSN Nachtwache",
+        btn_copy: "Kopiuj",
+        ai_title: "Konfiguracja silnika AI",
+        ai_subtitle: "Wybierz model, który będzie automatycznie diagnozował błędy i generował łatki (patche).",
+        ai_provider_label: "Dostawca Modelu AI",
+        ai_endpoint_label: "Endpoint URL",
+        ai_endpoint_hint: "Dla Ollama: http://localhost:11434, dla OpenAI: https://api.openai.com",
+        ai_model_label: "Nazwa Modelu",
+        ai_apikey_label: "Klucz API (API Key)",
+        ai_apikey_placeholder: "Pozostaw puste dla lokalnej Ollama",
+        btn_save_settings: "Zapisz Ustawienia",
+        donate_title: "Model „Co łaska” & Filozofia RobinHood dev",
+        donate_intro: "Nachtwache to niezależny projekt <strong>100% Open Source (MIT)</strong>. Zamiast płacić setki dolarów korporacjom i stawiać kontenery pożerające 20 GB pamięci RAM, dostajesz lekkie, samodzielne narzędzie dla programistów tworzone w duchu niezależności.",
+        donate_why: "Dlaczego warto wesprzeć?",
+        donate_p1: "Zero abonamentów i ukrytych opłat za liczbę zdarzeń.",
+        donate_p2: "Brak blokad licencyjnych BSL / FSL – pełna swoboda biznesowa.",
+        donate_p3: "Wspierasz rozwój funkcji AI Auto-Fix (automatyczne PR-y na GitHubie).",
+        donate_p4: "Pomagasz utrzymać serwery publicznych instancji demonstracyjnych.",
+        impressum_title: "Impressum & Nota Prawna (§ 5 DDG)",
+        btn_resolve: "Oznacz jako Rozwiązane",
+        btn_unresolve: "Przywróć (Aktywne)",
+        btn_ignore: "Ignoruj",
+        btn_diagnose: "Diagnozuj z AI",
+        ai_card_title: "Analiza Przyczyny & Auto-Fix",
+        btn_copy_diff: "Kopiuj Poprawkę",
+        stack_title: "Stack Trace",
+        bc_title: "Ostatnie Akcje (Breadcrumbs)",
+        footer_text: "Nachtwache — Lekki i autonomiczny strażnik błędów. Sandbox udostępniony na licencji MIT.",
+        footer_impressum: "Impressum & Datenschutz (§ 5 DDG)",
+        footer_donate: "Co Łaska ☕",
+        ai_badge: "⚡ AI zdiagnozowane",
+        occurrences: "Wystąpień",
+        first_seen: "Pierwszy",
+        last_seen: "Ostatni",
+        no_stack: "Brak informacji o stosie wywołań.",
+        no_bc: "Brak zarejestrowanych akcji poprzedzających.",
+        diagnosing: "Diagnozowanie...",
+        copy_clipboard_success: "Skopiowano do schowka: ",
+        copy_diff_success: "Skopiowano patch diff do schowka!",
+        settings_saved: "Ustawienia AI zostały pomyślnie zapisane.",
+        settings_error: "Błąd podczas zapisywania ustawień.",
+        clear_confirm: "Czy na pewno chcesz wyczyścić wszystkie zarejestrowane błędy?"
+      },
+      en: {
+        tab_issues: "Events & Errors",
+        tab_dsn: "Connect SDK",
+        tab_settings: "AI Config",
+        tab_donate: "Support & Coffee",
+        tab_impressum: "Legal Notice",
+        stat_unresolved_title: "Unresolved Issues",
+        stat_unresolved_hint: "Requiring attention",
+        stat_24h_title: "Events (24h)",
+        stat_24h_hint: "Recent frequency",
+        stat_total_title: "Total Events",
+        stat_total_hint: "Since database inception",
+        filter_unresolved: "Active",
+        filter_resolved: "Resolved",
+        filter_all: "All",
+        search_placeholder: "Search by error or file...",
+        btn_clear: "Clear All",
+        no_issues: "No errors recorded yet. Point your Sentry SDK to this server!",
+        no_search_results: "No search results found.",
+        dsn_title: "How to connect your application?",
+        dsn_subtitle: "Nachtwache is 100% drop-in compatible with official Sentry SDKs. Just update the <code>dsn</code> URL.",
+        dsn_step1: "1. Your Nachtwache DSN",
+        btn_copy: "Copy",
+        ai_title: "AI Engine Configuration",
+        ai_subtitle: "Choose the model that will automatically diagnose errors and generate git diff patches.",
+        ai_provider_label: "AI Model Provider",
+        ai_endpoint_label: "Endpoint URL",
+        ai_endpoint_hint: "For Ollama: http://localhost:11434, for OpenAI: https://api.openai.com",
+        ai_model_label: "Model Identifier",
+        ai_apikey_label: "API Key",
+        ai_apikey_placeholder: "Leave empty for local Ollama",
+        btn_save_settings: "Save Settings",
+        donate_title: "Pay-What-You-Want & RobinHood dev Philosophy",
+        donate_intro: "Nachtwache is an independent <strong>100% Open Source (MIT)</strong> project. Instead of paying hundreds of dollars for SaaS or running 20GB RAM containers, you get a lightweight ~15MB self-hosted developer guardian built for engineer sovereignty.",
+        donate_why: "Why support the project?",
+        donate_p1: "Zero subscription fees or arbitrary event limits.",
+        donate_p2: "No BSL / FSL commercial licensing traps – 100% MIT freedom.",
+        donate_p3: "Supports active development of AI Auto-Fix (automated GitHub PRs).",
+        donate_p4: "Helps maintain public cloud demo infrastructure.",
+        impressum_title: "Legal Notice & Impressum (§ 5 DDG)",
+        btn_resolve: "Mark as Resolved",
+        btn_unresolve: "Reopen (Active)",
+        btn_ignore: "Ignore",
+        btn_diagnose: "Diagnose with AI",
+        ai_card_title: "Root Cause Analysis & Auto-Fix",
+        btn_copy_diff: "Copy Patch",
+        stack_title: "Stack Trace",
+        bc_title: "Recent Actions (Breadcrumbs)",
+        footer_text: "Nachtwache — Lightweight autonomous error tracking. MIT License.",
+        footer_impressum: "Legal & Privacy (§ 5 DDG)",
+        footer_donate: "Support ☕",
+        ai_badge: "⚡ AI Diagnosed",
+        occurrences: "Occurrences",
+        first_seen: "First seen",
+        last_seen: "Last seen",
+        no_stack: "No stack trace available.",
+        no_bc: "No preceding breadcrumbs captured.",
+        diagnosing: "Diagnosing...",
+        copy_clipboard_success: "Copied to clipboard: ",
+        copy_diff_success: "Copied git diff patch to clipboard!",
+        settings_saved: "AI settings saved successfully.",
+        settings_error: "Error saving AI settings.",
+        clear_confirm: "Are you sure you want to delete all recorded errors?"
+      },
+      de: {
+        tab_issues: "Ereignisse & Fehler",
+        tab_dsn: "SDK Verbinden",
+        tab_settings: "KI-Konfiguration",
+        tab_donate: "Unterstützen",
+        tab_impressum: "Impressum",
+        stat_unresolved_title: "Offene Fehler",
+        stat_unresolved_hint: "Handlungsbedarf",
+        stat_24h_title: "Ereignisse (24h)",
+        stat_24h_hint: "Häufigkeit letzte 24h",
+        stat_total_title: "Gesamte Ereignisse",
+        stat_total_hint: "Seit Datenbankstart",
+        filter_unresolved: "Aktiv",
+        filter_resolved: "Gelöst",
+        filter_all: "Alle",
+        search_placeholder: "Nach Fehler oder Datei suchen...",
+        btn_clear: "Bereinigen",
+        no_issues: "Noch keine Fehler erfasst. Leiten Sie Ihr Sentry SDK auf diesen Server!",
+        no_search_results: "Keine Suchergebnisse gefunden.",
+        dsn_title: "Wie binde ich meine Anwendung an?",
+        dsn_subtitle: "Nachtwache ist zu 100 % kompatibel mit offiziellen Sentry-Bibliotheken. Tauschen Sie einfach die DSN-URL aus.",
+        dsn_step1: "1. Ihr Nachtwache-DSN",
+        btn_copy: "Kopieren",
+        ai_title: "KI-Engine Konfiguration",
+        ai_subtitle: "Wählen Sie das Modell, das Fehler automatisch analysiert und Git-Patches generiert.",
+        ai_provider_label: "KI-Anbieter",
+        ai_endpoint_label: "Endpunkt-URL",
+        ai_endpoint_hint: "Für Ollama: http://localhost:11434, für OpenAI: https://api.openai.com",
+        ai_model_label: "Modellname",
+        ai_apikey_label: "API-Schlüssel",
+        ai_apikey_placeholder: "Für lokale Ollama leer lassen",
+        btn_save_settings: "Einstellungen speichern",
+        donate_title: "Unterstützung & RobinHood-dev-Philosophie",
+        donate_intro: "Nachtwache ist ein unabhängiges <strong>100% Open-Source-Projekt (MIT)</strong>. Statt monatlicher SaaS-Gebühren erhalten Sie einen schlanken ~15-MB-Wächter, der Entwicklern volle Unabhängigkeit und Kontrolle zurückgibt.",
+        donate_why: "Warum unterstützen?",
+        donate_p1: "Keine Abonnements oder versteckten Ereignis-Limits.",
+        donate_p2: "Keine BSL / FSL Lizenzfallen – 100% freie Nutzung.",
+        donate_p3: "Fördert die Weiterentwicklung von KI-Auto-Fix.",
+        donate_p4: "Hält öffentliche Demoinstanzen online.",
+        impressum_title: "Impressum & Rechtliche Hinweise (§ 5 DDG)",
+        btn_resolve: "Als gelöst markieren",
+        btn_unresolve: "Wiedereröffnen",
+        btn_ignore: "Ignorieren",
+        btn_diagnose: "Mit KI diagnostizieren",
+        ai_card_title: "Ursachenanalyse & Auto-Fix",
+        btn_copy_diff: "Patch kopieren",
+        stack_title: "Aufrufstapel (Stack Trace)",
+        bc_title: "Letzte Aktionen (Breadcrumbs)",
+        footer_text: "Nachtwache — Schlanker autonomer Fehler-Wächter. Veröffentlicht unter MIT-Lizenz.",
+        footer_impressum: "Impressum & Datenschutz (§ 5 DDG)",
+        footer_donate: "Kaffee spendieren ☕",
+        ai_badge: "⚡ KI diagnostiziert",
+        occurrences: "Häufigkeit",
+        first_seen: "Zuerst",
+        last_seen: "Zuletzt",
+        no_stack: "Keine Aufrufstapel-Informationen vorhanden.",
+        no_bc: "Keine vorangehenden Breadcrumbs aufgezeichnet.",
+        diagnosing: "Diagnose läuft...",
+        copy_clipboard_success: "In die Zwischenablage kopiert: ",
+        copy_diff_success: "Git-Diff-Patch kopiert!",
+        settings_saved: "KI-Einstellungen erfolgreich gespeichert.",
+        settings_error: "Fehler beim Speichern der Einstellungen.",
+        clear_confirm: "Möchten Sie wirklich alle erfassten Fehler löschen?"
+      },
+      es: {
+        tab_issues: "Eventos y Errores",
+        tab_dsn: "Conectar SDK",
+        tab_settings: "Configuración IA",
+        tab_donate: "Apoyar el Proyecto",
+        tab_impressum: "Aviso Legal",
+        stat_unresolved_title: "Errores Abiertos",
+        stat_unresolved_hint: "Requieren atención",
+        stat_24h_title: "Eventos (24h)",
+        stat_24h_hint: "Frecuencia reciente",
+        stat_total_title: "Eventos Totales",
+        stat_total_hint: "Desde el inicio de la BD",
+        filter_unresolved: "Activos",
+        filter_resolved: "Resueltos",
+        filter_all: "Todos",
+        search_placeholder: "Buscar por error o archivo...",
+        btn_clear: "Limpiar",
+        no_issues: "No hay errores registrados aún. ¡Apunta tu SDK de Sentry a este servidor!",
+        no_search_results: "No se encontraron resultados.",
+        dsn_title: "¿Cómo conectar tu aplicación?",
+        dsn_subtitle: "Nachtwache es 100% compatible con los SDK oficiales de Sentry. Solo cambia la URL en <code>dsn</code>.",
+        dsn_step1: "1. Tu DSN de Nachtwache",
+        btn_copy: "Copiar",
+        ai_title: "Configuración del Motor de IA",
+        ai_subtitle: "Elige el modelo que diagnosticará errores automáticamente y generará parches git.",
+        ai_provider_label: "Proveedor de IA",
+        ai_endpoint_label: "URL del Endpoint",
+        ai_endpoint_hint: "Para Ollama: http://localhost:11434, para OpenAI: https://api.openai.com",
+        ai_model_label: "Identificador del Modelo",
+        ai_apikey_label: "Clave API (API Key)",
+        ai_apikey_placeholder: "Dejar en blanco para Ollama local",
+        btn_save_settings: "Guardar Configuración",
+        donate_title: "Apoyo y Filosofía RobinHood dev",
+        donate_intro: "Nachtwache es un proyecto independiente <strong>100% Código Abierto (MIT)</strong>. Sin suscripciones costosas ni contenedores de 20 GB de RAM, diseñado para la soberanía técnica de los desarrolladores.",
+        donate_why: "¿Por qué apoyar el proyecto?",
+        donate_p1: "Cero tarifas de suscripción o límites arbitrarios.",
+        donate_p2: "Sin restricciones de licencia BSL/FSL – 100% libertad MIT.",
+        donate_p3: "Apoya el desarrollo continuo de IA Auto-Fix.",
+        donate_p4: "Mantiene en línea las instancias de demostración pública.",
+        impressum_title: "Aviso Legal e Impressum (§ 5 DDG)",
+        btn_resolve: "Marcar como Resuelto",
+        btn_unresolve: "Reabrir (Activo)",
+        btn_ignore: "Ignorar",
+        btn_diagnose: "Diagnosticar con IA",
+        ai_card_title: "Análisis de Causa Raíz y Auto-Fix",
+        btn_copy_diff: "Copiar Parche",
+        stack_title: "Pila de Llamadas (Stack Trace)",
+        bc_title: "Acciones Recientes (Breadcrumbs)",
+        footer_text: "Nachtwache — Guardián de errores autónomo y ligero. Licencia MIT.",
+        footer_impressum: "Aviso Legal y Privacidad (§ 5 DDG)",
+        footer_donate: "Invítame a un café ☕",
+        ai_badge: "⚡ Diagnosticado por IA",
+        occurrences: "Ocurrencias",
+        first_seen: "Primero",
+        last_seen: "Último",
+        no_stack: "No hay información de pila disponible.",
+        no_bc: "No hay eventos previos registrados.",
+        diagnosing: "Diagnosticando...",
+        copy_clipboard_success: "Copiado al portapapeles: ",
+        copy_diff_success: "¡Parche git diff copiado al portapapeles!",
+        settings_saved: "Configuración de IA guardada con éxito.",
+        settings_error: "Error al guardar la configuración.",
+        clear_confirm: "¿Estás seguro de que deseas eliminar todos los errores registrados?"
+      },
+      fr: {
+        tab_issues: "Événements & Erreurs",
+        tab_dsn: "Connecter le SDK",
+        tab_settings: "Configuration IA",
+        tab_donate: "Soutenir le Projet",
+        tab_impressum: "Mentions Légales",
+        stat_unresolved_title: "Erreurs Ouvertes",
+        stat_unresolved_hint: "Action requise",
+        stat_24h_title: "Événements (24h)",
+        stat_24h_hint: "Fréquence récente",
+        stat_total_title: "Total des Événements",
+        stat_total_hint: "Depuis le démarrage",
+        filter_unresolved: "Actifs",
+        filter_resolved: "Résolus",
+        filter_all: "Tous",
+        search_placeholder: "Rechercher par erreur ou fichier...",
+        btn_clear: "Effacer",
+        no_issues: "Aucun événement enregistré. Pointez votre SDK Sentry vers ce serveur !",
+        no_search_results: "Aucun résultat trouvé.",
+        dsn_title: "Comment connecter votre application ?",
+        dsn_subtitle: "Nachtwache est 100 % compatible avec les bibliothèques officielles Sentry. Changez simplement l'URL <code>dsn</code>.",
+        dsn_step1: "1. Votre DSN Nachtwache",
+        btn_copy: "Copier",
+        ai_title: "Configuration du Moteur IA",
+        ai_subtitle: "Choisissez le modèle qui diagnostiquera automatiquement les erreurs et générera des correctifs git.",
+        ai_provider_label: "Fournisseur IA",
+        ai_endpoint_label: "URL du Point de Terminaison",
+        ai_endpoint_hint: "Pour Ollama: http://localhost:11434, pour OpenAI: https://api.openai.com",
+        ai_model_label: "Identifiant du Modèle",
+        ai_apikey_label: "Clé API (API Key)",
+        ai_apikey_placeholder: "Laisser vide pour Ollama local",
+        btn_save_settings: "Enregistrer les Paramètres",
+        donate_title: "Soutien & Philosophie RobinHood dev",
+        donate_intro: "Nachtwache est un projet indépendant <strong>100% Open Source (MIT)</strong>. Pas d'abonnements coûteux ni de conteneurs de 20 Go de RAM, conçu pour rendre la souveraineté technique aux développeurs.",
+        donate_why: "Pourquoi soutenir le projet ?",
+        donate_p1: "Aucun abonnement ni limite arbitraire d'événements.",
+        donate_p2: "Aucun piège de licence BSL/FSL – 100% liberté MIT.",
+        donate_p3: "Soutient le développement continu d'IA Auto-Fix.",
+        donate_p4: "Maintient les serveurs de démonstration en ligne.",
+        impressum_title: "Mentions Légales & Impressum (§ 5 DDG)",
+        btn_resolve: "Marquer comme Résolu",
+        btn_unresolve: "Rouvrir (Actif)",
+        btn_ignore: "Ignorer",
+        btn_diagnose: "Diagnostiquer avec l'IA",
+        ai_card_title: "Analyse de Cause Racine & Auto-Fix",
+        btn_copy_diff: "Copier le Correctif",
+        stack_title: "Trace de la Pile (Stack Trace)",
+        bc_title: "Actions Récentes (Breadcrumbs)",
+        footer_text: "Nachtwache — Gardien d'erreurs autonome et léger. Licence MIT.",
+        footer_impressum: "Mentions Légales & Confidentialité (§ 5 DDG)",
+        footer_donate: "Offrir un café ☕",
+        ai_badge: "⚡ Diagnostiqué par l'IA",
+        occurrences: "Occurrences",
+        first_seen: "Première fois",
+        last_seen: "Dernière fois",
+        no_stack: "Aucune information de pile disponible.",
+        no_bc: "Aucun fil d'Ariane capturé.",
+        diagnosing: "Diagnostic en cours...",
+        copy_clipboard_success: "Copié dans le presse-papiers : ",
+        copy_diff_success: "Correctif git diff copié dans le presse-papiers !",
+        settings_saved: "Paramètres IA enregistrés avec succès.",
+        settings_error: "Erreur lors de l'enregistrement des paramètres.",
+        clear_confirm: "Voulez-vous vraiment effacer toutes les erreurs enregistrées ?"
+      }
+    };
+
+    function t(key) {
+      return (I18N[currentLang] && I18N[currentLang][key]) || (I18N['en'] && I18N['en'][key]) || key;
+    }
+
+    function setLanguage(lang) {
+      if (!I18N[lang]) lang = 'en';
+      currentLang = lang;
+      localStorage.setItem('nw_lang', lang);
+      document.documentElement.lang = lang;
+
+      const sel = document.getElementById('lang-select');
+      if (sel) sel.value = lang;
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const k = el.getAttribute('data-i18n');
+        if (k && t(k)) el.innerHTML = t(k);
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const k = el.getAttribute('data-i18n-placeholder');
+        if (k && t(k)) el.placeholder = t(k);
+      });
+      document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        const k = el.getAttribute('data-i18n-title');
+        if (k && t(k)) el.title = t(k);
+      });
+
+      renderIssues();
+      if (currentActiveIssue) {
+        document.getElementById('btn-resolve').innerText = currentActiveIssue.status === 'resolved' ? t('btn_unresolve') : t('btn_resolve');
+      }
+    }
 
     async function init() {
       // Auto-compute DSN based on current window location
@@ -869,6 +1295,20 @@ sentry_sdk.init(
       document.getElementById('dsn-display').innerText = currentDsn;
       document.querySelectorAll('.dsn-val').forEach(el => el.innerText = currentDsn);
 
+      // Auto-detect language
+      const savedLang = localStorage.getItem('nw_lang');
+      if (savedLang && I18N[savedLang]) {
+        setLanguage(savedLang);
+      } else {
+        const navLang = (navigator.language || '').slice(0, 2).toLowerCase();
+        if (I18N[navLang]) {
+          setLanguage(navLang);
+        } else {
+          setLanguage('en');
+        }
+      }
+
+      checkHashRoute();
       await Promise.all([refreshData(), loadAiSettings()]);
       setInterval(refreshData, 5000); // Polling every 5s for live updates
     }
@@ -909,14 +1349,14 @@ sentry_sdk.init(
       if (filtered.length === 0) {
         container.innerHTML = `
           <div style="text-align: center; padding: 3rem; color: var(--text-subtle);">
-            ${currentIssues.length === 0 ? 'Brak zarejestrowanych błędów. Skieruj swoje Sentry SDK na ten serwer!' : 'Brak wyników wyszukiwania.'}
+            ${currentIssues.length === 0 ? t('no_issues') : t('no_search_results')}
           </div>
         `;
         return;
       }
 
       container.innerHTML = filtered.map(iss => {
-        const hasAi = iss.ai_diagnosis ? `<span class="badge badge-ai">⚡ AI zdiagnozowane</span>` : '';
+        const hasAi = iss.ai_diagnosis ? `<span class="badge badge-ai">${t('ai_badge')}</span>` : '';
         const levelBadge = `<span class="badge badge-${iss.level}">${iss.level}</span>`;
         const platformBadge = `<span class="badge badge-platform">${iss.platform}</span>`;
 
@@ -931,8 +1371,8 @@ sentry_sdk.init(
               <div class="issue-title">${escapeHtml(iss.title)}</div>
               <div class="issue-culprit">${escapeHtml(iss.culprit)}</div>
               <div class="issue-meta">
-                <span>Pierwszy: ${formatTime(iss.first_seen)}</span>
-                <span>Ostatni: ${formatTime(iss.last_seen)}</span>
+                <span>${t('first_seen')}: ${formatTime(iss.first_seen)}</span>
+                <span>${t('last_seen')}: ${formatTime(iss.last_seen)}</span>
               </div>
             </div>
             <div class="issue-side">
@@ -955,12 +1395,12 @@ sentry_sdk.init(
 
         document.getElementById('modal-title').innerText = issue.title;
         document.getElementById('modal-culprit').innerText = issue.culprit;
-        document.getElementById('btn-resolve').innerText = issue.status === 'resolved' ? 'Przywróć (Aktywne)' : 'Oznacz jako Rozwiązane';
+        document.getElementById('btn-resolve').innerText = issue.status === 'resolved' ? t('btn_unresolve') : t('btn_resolve');
 
         document.getElementById('modal-badges').innerHTML = `
           <span class="badge badge-${issue.level}">${issue.level}</span>
           <span class="badge badge-platform">${issue.platform}</span>
-          <span class="badge badge-platform">Wystąpień: ${issue.count}</span>
+          <span class="badge badge-platform">${t('occurrences')}: ${issue.count}</span>
         `;
 
         // AI Section
@@ -994,7 +1434,7 @@ sentry_sdk.init(
             `;
           }).join('');
         } else {
-          stackContainer.innerHTML = '<div style="color: var(--text-subtle); font-size: 0.85rem;">Brak informacji o stosie wywołań.</div>';
+          stackContainer.innerHTML = `<div style="color: var(--text-subtle); font-size: 0.85rem;">${t('no_stack')}</div>`;
         }
 
         // Render Breadcrumbs
@@ -1008,7 +1448,7 @@ sentry_sdk.init(
             </div>
           `).join('');
         } else {
-          bcContainer.innerHTML = '<div style="color: var(--text-subtle); font-size: 0.85rem;">Brak zarejestrowanych akcji poprzedzających.</div>';
+          bcContainer.innerHTML = `<div style="color: var(--text-subtle); font-size: 0.85rem;">${t('no_bc')}</div>`;
         }
 
         document.getElementById('issue-modal').classList.add('open');
@@ -1021,7 +1461,7 @@ sentry_sdk.init(
       if (!currentActiveIssue) return;
       const btn = document.getElementById('btn-ai-diagnose');
       const originalText = btn.innerHTML;
-      btn.innerHTML = `<span class="loading-spinner"></span> Diagnozowanie...`;
+      btn.innerHTML = `<span class="loading-spinner"></span> ${t('diagnosing')}`;
       btn.disabled = true;
 
       try {
@@ -1031,10 +1471,10 @@ sentry_sdk.init(
           await openIssueDetails(currentActiveIssue.id);
           await refreshData();
         } else {
-          alert(data.error || 'Błąd diagnozy AI. Sprawdź konfigurację w zakładce "Konfiguracja AI".');
+          alert(data.error || 'AI diagnosis error.');
         }
       } catch (err) {
-        alert('Błąd połączenia z silnikiem AI: ' + err.message);
+        alert('AI connection error: ' + err.message);
       } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
@@ -1065,7 +1505,7 @@ sentry_sdk.init(
     }
 
     async function clearAllData() {
-      if (!confirm('Czy na pewno chcesz wyczyścić wszystkie zarejestrowane błędy?')) return;
+      if (!confirm(t('clear_confirm'))) return;
       await fetch('/api/clear', { method: 'POST' });
       await refreshData();
     }
@@ -1082,11 +1522,22 @@ sentry_sdk.init(
         const el = document.getElementById(`view-${v}`);
         if (el) el.classList.toggle('hidden', v !== viewName);
       });
-      document.querySelectorAll('.nav-tab').forEach((tab, idx) => {
-        const names = ['issues', 'dsn', 'settings', 'donate', 'impressum'];
-        tab.classList.toggle('active', names[idx] === viewName);
+      document.querySelectorAll('.nav-tab').forEach((tab) => {
+        const tabName = tab.getAttribute('data-tab');
+        tab.classList.toggle('active', tabName === viewName);
       });
+      if (window.location.hash.replace('#', '') !== viewName) {
+        history.replaceState(null, '', '#' + viewName);
+      }
     }
+
+    function checkHashRoute() {
+      const h = (window.location.hash || '').replace('#', '').toLowerCase();
+      if (['issues', 'dsn', 'settings', 'donate', 'impressum'].includes(h)) {
+        switchView(h);
+      }
+    }
+    window.addEventListener('hashchange', checkHashRoute);
 
     function openDsnModal() {
       switchView('dsn');
@@ -1095,7 +1546,8 @@ sentry_sdk.init(
     function setFilter(status) {
       currentFilter = status;
       document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.innerText.toLowerCase().includes(status === 'all' ? 'wszystkie' : (status === 'resolved' ? 'rozwiązane' : 'aktywne')));
+        const filterVal = btn.getAttribute('data-filter');
+        btn.classList.toggle('active', filterVal === status);
       });
       refreshData();
     }
@@ -1113,7 +1565,7 @@ sentry_sdk.init(
           document.getElementById('ai-endpoint').value = s.endpoint || '';
           document.getElementById('ai-model').value = s.model || '';
           if (s.has_key) {
-            document.getElementById('ai-key-hint').innerText = `Zapisany klucz: ${s.masked_key}`;
+            document.getElementById('ai-key-hint').innerText = `API Key: ${s.masked_key}`;
           }
         }
       } catch (err) {
@@ -1139,10 +1591,10 @@ sentry_sdk.init(
       });
 
       if (res.ok) {
-        alert('Ustawienia AI zostały pomyślnie zapisane.');
+        alert(t('settings_saved'));
         loadAiSettings();
       } else {
-        alert('Błąd podczas zapisywania ustawień.');
+        alert(t('settings_error'));
       }
     }
 
@@ -1153,29 +1605,29 @@ sentry_sdk.init(
 
       if (provider === 'ollama') {
         endpointInput.value = 'http://localhost:11434';
-        modelInput.value = 'qwen2.5-coder:7b';
+        modelInput.value = 'deepseek-4.1-flash';
       } else if (provider === 'gemini') {
         endpointInput.value = '';
-        modelInput.value = 'gemini-2.5-flash';
+        modelInput.value = 'gemini-3.8-flash';
       } else if (provider === 'openai') {
         endpointInput.value = 'https://api.openai.com';
-        modelInput.value = 'gpt-4o-mini';
+        modelInput.value = 'gpt-6-astra';
       } else if (provider === 'anthropic') {
         endpointInput.value = '';
-        modelInput.value = 'claude-3-5-sonnet-20241022';
+        modelInput.value = 'claude-sonnet-5';
       }
     }
 
     function copyText(id) {
       const text = document.getElementById(id).innerText;
       navigator.clipboard.writeText(text);
-      alert('Skopiowano do schowka: ' + text);
+      alert(t('copy_clipboard_success') + text);
     }
 
     function copyAiDiff() {
       const diff = document.getElementById('modal-ai-diff').innerText;
       navigator.clipboard.writeText(diff);
-      alert('Skopiowano patch diff do schowka!');
+      alert(t('copy_diff_success'));
     }
 
     function escapeHtml(str) {
