@@ -15,13 +15,13 @@ pub async fn handle_envelope(
     _headers: HeaderMap,
     body: Bytes,
 ) -> impl IntoResponse {
-    let body_str = match String::from_utf8(body.to_vec()) {
+    let body_str = match decompress_if_needed(&body) {
         Ok(s) => s,
         Err(e) => {
-            warn!("Failed to read envelope body as UTF-8: {:?}", e);
+            warn!("Failed to read envelope body: {}", e);
             return (
                 StatusCode::BAD_REQUEST,
-                Json(json!({"error": "invalid utf-8 body"})),
+                Json(json!({"error": e})),
             );
         }
     };
@@ -279,3 +279,73 @@ fn extract_title_and_culprit(payload: &Value) -> (String, String, String) {
     let fingerprint_hint = format!("{}:{}", title, culprit);
     (title, culprit, fingerprint_hint)
 }
+
+fn decompress_if_needed(bytes: &[u8]) -> Result<String, String> {
+    use flate2::read::GzDecoder;
+    use std::io::Read;
+
+    // Guard against gzip memory bombs by capping decompressed payload to 10 MB
+    const MAX_DECOMPRESSED_BYTES: u64 = 10 * 1024 * 1024;
+
+    if bytes.starts_with(&[0x1f, 0x8b]) {
+        let decoder = GzDecoder::new(bytes);
+        let mut limited = decoder.take(MAX_DECOMPRESSED_BYTES);
+        let mut s = String::new();
+        limited
+            .read_to_string(&mut s)
+            .map_err(|e| format!("Gzip decompression failed: {}", e))?;
+        Ok(s)
+    } else {
+        String::from_utf8(bytes.to_vec())
+            .map_err(|e| format!("UTF-8 decode failed: {}", e))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn test_extract_title_and_culprit_from_exception() {
+        let payload = json!({
+            "exception": {
+                "values": [{
+                    "type": "TypeError",
+                    "value": "Cannot read properties of undefined",
+                    "stacktrace": {
+                        "frames": [
+                            { "filename": "app.js", "lineno": 42, "function": "handleClick", "in_app": true }
+                        ]
+                    }
+                }]
+            }
+        });
+
+        let (title, culprit, hint) = extract_title_and_culprit(&payload);
+        assert_eq!(title, "TypeError: Cannot read properties of undefined");
+        assert_eq!(culprit, "app.js:42 in handleClick");
+        assert!(hint.contains("TypeError"));
+    }
+
+    #[test]
+    fn test_extract_title_from_message_fallback() {
+        let payload = json!({
+            "message": "Server started on port 8080",
+            "culprit": "server.go:12"
+        });
+
+        let (title, culprit, _) = extract_title_and_culprit(&payload);
+        assert_eq!(title, "Server started on port 8080");
+        assert_eq!(culprit, "server.go:12");
+    }
+
+    #[test]
+    fn test_decompress_plain_utf8() {
+        let raw = b"{\"hello\": \"world\"}";
+        let res = decompress_if_needed(raw).unwrap();
+        assert_eq!(res, "{\"hello\": \"world\"}");
+    }
+}
+
+

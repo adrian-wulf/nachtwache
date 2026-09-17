@@ -1,0 +1,18 @@
+services:
+  nachtwache:
+    build: .
+    container_name: nachtwache
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - HOST=0.0.0.0
+      - NACHTWACHE_DB=/data/nachtwache.db
+    volumes:
+      - ./data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/stats"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
